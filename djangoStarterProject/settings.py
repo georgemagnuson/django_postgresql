@@ -39,7 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "debug_toolbar",
     'schema_viewer',
-    "people.apps.PeopleConfig"
+    "people.apps.PeopleConfig",
+    "taxrate",
+    "jitsuitem",
+    "supplier",
+    # "supplieritem",
     ]
 
 MIDDLEWARE = [

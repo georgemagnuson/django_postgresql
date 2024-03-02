@@ -464,18 +464,19 @@ class Supplier(models.Model):
 
 
 class Supplieritem(models.Model):
-    uuid = models.UUIDField(primary_key=True)
+    id = models.UUIDField(primary_key=True)
+    deleted_row = models.BooleanField(blank=True, null=True)
+    supplier_uuid = models.ForeignKey('XSupplierV00', models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
     supplier_item_code = models.CharField(blank=True, null=True)
     supplier_item_description = models.CharField(blank=True, null=True)
+    jitsu_item_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsu_item_uuid', blank=True, null=True)
     unit_of_purchase = models.CharField(blank=True, null=True)
     quantity_unit_of_purchase_in_unit_of_usage = models.FloatField(blank=True, null=True)
-    jitsuitem_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsuitem_uuid', blank=True, null=True)
-    supplier_uuid = models.ForeignKey(Supplier, models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'supplieritem'
-        unique_together = (('uuid', 'supplier_item_code'),)
+        unique_together = (('supplier_uuid', 'supplier_item_code'),)
 
 
 class TaggitTag(models.Model):
@@ -572,20 +573,19 @@ class XSupplierV00(models.Model):
         db_table = 'x_supplier_v00'
 
 
-class XSupplieritemV00(models.Model):
-    id = models.UUIDField(primary_key=True)
-    deleted_row = models.BooleanField(blank=True, null=True)
-    supplier_uuid = models.ForeignKey(XSupplierV00, models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
+class XSupplieritemEmpty(models.Model):
+    uuid = models.UUIDField(primary_key=True)
     supplier_item_code = models.CharField(blank=True, null=True)
     supplier_item_description = models.CharField(blank=True, null=True)
-    jitsu_item_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsu_item_uuid', blank=True, null=True)
     unit_of_purchase = models.CharField(blank=True, null=True)
     quantity_unit_of_purchase_in_unit_of_usage = models.FloatField(blank=True, null=True)
+    jitsuitem_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsuitem_uuid', blank=True, null=True)
+    supplier_uuid = models.ForeignKey(Supplier, models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'x_supplieritem_v00'
-        unique_together = (('supplier_uuid', 'supplier_item_code'),)
+        db_table = 'x_supplieritem_empty'
+        unique_together = (('uuid', 'supplier_item_code'),)
 
 
 class XSuppliersOld(models.Model):
