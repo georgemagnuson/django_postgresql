@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db.models.functions import Upper
 # Register your models here.
-from .models import Supplier, Supplieritem
+from .models import Supplier, Supplieritem, Invoice, Invoiceentry, Message
 
 
 class SupplierAdmin(admin.ModelAdmin):
@@ -42,6 +42,7 @@ class SupplieritemAdmin(admin.ModelAdmin):
         return obj.quantity_unit_of_purchase_in_unit_of_usage
 
     qty_purch_in_usage.short_description = 'Qty Purch in Unit of Usage'
+
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return queryset.annotate(upper_supplieritem_code=Upper('supplieritem_code')).order_by(
@@ -50,3 +51,9 @@ class SupplieritemAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Supplieritem, SupplieritemAdmin)
+
+admin.site.register(Invoice)
+
+admin.site.register(Invoiceentry)
+
+admin.site.register(Message)

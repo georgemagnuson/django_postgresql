@@ -396,32 +396,10 @@ class Jitsuingredient(models.Model):
         db_table = 'jitsuingredient'
 
 
-class Jitsuitem(models.Model):
-    uuid = models.UUIDField(primary_key=True)
-    deleted_row = models.BooleanField(blank=True, null=True)
-    description = models.CharField()
-    category = models.ForeignKey('Jitsuitemcategory', models.DO_NOTHING, db_column='category', blank=True, null=True)
-    unit_of_measure = models.CharField(blank=True, null=True)
-    cost_per_unit_of_measure = models.FloatField(blank=True, null=True)
-    alternate = models.CharField(max_length=1, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'jitsuitem'
-
-
-class Jitsuitemcategory(models.Model):
-    uuid = models.UUIDField(primary_key=True)
-    deleted_row = models.BooleanField(blank=True, null=True)
-    description = models.CharField()
-
-    class Meta:
-        managed = False
-        db_table = 'jitsuitemcategory'
 
 
 class Message(models.Model):
-    id = models.UUIDField(primary_key=True)
+    uuid = models.UUIDField(primary_key=True)
     gmail_message_id = models.CharField(unique=True, blank=True, null=True)
     message_date = models.DateField(blank=True, null=True)
     message_from = models.CharField(blank=True, null=True)
@@ -449,34 +427,6 @@ class Sqlmodelbase(models.Model):
         db_table = 'sqlmodelbase'
 
 
-class Supplier(models.Model):
-    uuid = models.UUIDField(primary_key=True)
-    name = models.CharField(unique=True, blank=True, null=True)
-    address = models.CharField(blank=True, null=True)
-    includes_gst_in_prices = models.BooleanField()
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
-    deleted_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'supplier'
-
-
-class Supplieritem(models.Model):
-    id = models.UUIDField(primary_key=True)
-    deleted_row = models.BooleanField(blank=True, null=True)
-    supplier_uuid = models.ForeignKey('XSupplierV00', models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
-    supplier_item_code = models.CharField(blank=True, null=True)
-    supplier_item_description = models.CharField(blank=True, null=True)
-    jitsu_item_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsu_item_uuid', blank=True, null=True)
-    unit_of_purchase = models.CharField(blank=True, null=True)
-    quantity_unit_of_purchase_in_unit_of_usage = models.FloatField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'supplieritem'
-        unique_together = (('supplier_uuid', 'supplier_item_code'),)
 
 
 class TaggitTag(models.Model):

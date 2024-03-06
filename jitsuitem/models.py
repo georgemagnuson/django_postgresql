@@ -19,9 +19,10 @@ class Jitsuitem(models.Model):
     uuid = models.UUIDField(primary_key=True)
     deleted_row = models.BooleanField(blank=True, null=True)
     description = models.CharField()
-    # category = models.ForeignKey('Jitsuitemcategory', models.DO_NOTHING, db_column='uuid', blank=True, null=True)
     category_uuid = models.ForeignKey(
-        'Jitsuitemcategory', to_field='uuid', on_delete=models.DO_NOTHING, db_column='category_uuid', blank=True,
+        Jitsuitemcategory,
+        on_delete=models.DO_NOTHING,
+        blank=True,
         null=True
         )
     unit_of_measure = models.CharField(blank=True, null=True)
