@@ -301,6 +301,7 @@ class IngredientIngredient(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField(blank=True, null=True)
     deleted_at = models.DateTimeField(blank=True, null=True)
+    category_uuid = models.UUIDField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -323,10 +324,10 @@ class IngredientIngredientlist(models.Model):
 
 
 class Invoice(models.Model):
-    id = models.UUIDField(primary_key=True)
-    gmail_message = models.ForeignKey('Message', models.DO_NOTHING, to_field='gmail_message_id', blank=True, null=True)
+    uuid = models.UUIDField(primary_key=True)
+    gmail_message = models.ForeignKey('Message', models.DO_NOTHING, to_field='gmail_message_id', blank=True, null=True, db_comment='link to message database from gmail')
     invoice_date = models.DateField()
-    invoice_issuer = models.ForeignKey('XSupplierV00', models.DO_NOTHING, db_column='invoice_issuer', to_field='name', blank=True, null=True)
+    invoice_issuer = models.CharField(blank=True, null=True)
     invoice_supplier_uuid = models.UUIDField(blank=True, null=True)
     invoice_number = models.CharField()
     invoice_amount_gross = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
@@ -341,11 +342,11 @@ class Invoice(models.Model):
 
 
 class Invoiceentry(models.Model):
-    id = models.UUIDField(primary_key=True)
+    uuid = models.UUIDField(primary_key=True)
     gmail_message_id = models.CharField(blank=True, null=True)
-    entry_supplier_item_code = models.CharField(blank=True, null=True)
-    entry_jitsu_item_code = models.ForeignKey('Jitsuitem', models.DO_NOTHING, db_column='entry_jitsu_item_code', blank=True, null=True)
-    entry_supplier_description = models.CharField(blank=True, null=True)
+    entry_supplieritem_code = models.CharField(blank=True, null=True)
+    entry_jitsuitem_uuid = models.ForeignKey('Jitsuitem', models.DO_NOTHING, db_column='entry_jitsuitem_uuid', blank=True, null=True)
+    entry_supplieritem_description = models.CharField(blank=True, null=True)
     entry_qty = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     entry_unit_of_purchase = models.CharField(blank=True, null=True)
     entry_price = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
@@ -354,9 +355,9 @@ class Invoiceentry(models.Model):
     entry_net_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     entry_number_of_pieces = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     deleted_row = models.BooleanField(blank=True, null=True)
-    invoice = models.ForeignKey(Invoice, models.DO_NOTHING, blank=True, null=True)
+    invoice_uuid = models.ForeignKey(Invoice, models.DO_NOTHING, db_column='invoice_uuid', blank=True, null=True, db_comment='link to invoice')
     supplier_uuid = models.UUIDField(blank=True, null=True)
-    supplier_item_uuid = models.UUIDField(blank=True, null=True)
+    supplieritem_uuid = models.ForeignKey('Supplieritem', models.DO_NOTHING, db_column='supplieritem_uuid', blank=True, null=True)
     entry_waste_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
 
     class Meta:
@@ -364,38 +365,40 @@ class Invoiceentry(models.Model):
         db_table = 'invoiceentry'
 
 
-class InvoiceentryOld(models.Model):
-    id = models.UUIDField(blank=True, null=True)
-    invoice_id = models.UUIDField(blank=True, null=True)
-    supplier_uuid = models.UUIDField(blank=True, null=True)
-    entry_qty = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_price = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_discount = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_gross_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_waste_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_supplier_item_code = models.CharField(blank=True, null=True)
-    entry_supplier_description = models.CharField(max_length=1024, blank=True, null=True)
-    entry_jitsu_item_code = models.UUIDField(blank=True, null=True)
-    supplier_item_uuid = models.UUIDField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'invoiceentry_old'
-
-
 class Jitsuingredient(models.Model):
-    id = models.UUIDField(primary_key=True)
+    uuid = models.UUIDField(primary_key=True)
     deleted_row = models.BooleanField(blank=True, null=True)
-    link_to_ingredient = models.ForeignKey('Jitsuitem', models.DO_NOTHING, db_column='link_to_Ingredient')  # Field name made lowercase.
+    link_to_ingredient_uuid = models.ForeignKey('Jitsuitem', models.DO_NOTHING, db_column='link_to_Ingredient_uuid')  # Field name made lowercase.
     quantity_used = models.FloatField(blank=True, null=True)
-    recipe_uuid = models.ForeignKey('Jitsuitem', models.DO_NOTHING, db_column='recipe_uuid', related_name='jitsuingredient_recipe_uuid_set')
-    unit_of_measure_xlt = models.CharField(db_column='unit_of_measure__xlt', max_length=1024, blank=True, null=True)  # Field renamed because it contained more than one '_' in a row.
+    jitsuitem_uuid = models.ForeignKey('Jitsuitem', models.DO_NOTHING, db_column='jitsuitem_uuid', related_name='jitsuingredient_jitsuitem_uuid_set')
+    unit_of_measure = models.CharField(max_length=1024, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'jitsuingredient'
 
 
+class Jitsuitem(models.Model):
+    uuid = models.UUIDField(primary_key=True)
+    deleted_row = models.BooleanField(blank=True, null=True)
+    description = models.CharField()
+    category_uuid = models.ForeignKey('Jitsuitemcategory', models.DO_NOTHING, db_column='category_uuid', blank=True, null=True)
+    unit_of_measure = models.CharField(blank=True, null=True)
+    cost_per_unit_of_measure = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'jitsuitem'
+
+
+class Jitsuitemcategory(models.Model):
+    uuid = models.UUIDField(primary_key=True)
+    deleted_row = models.BooleanField(blank=True, null=True)
+    description = models.CharField()
+
+    class Meta:
+        managed = False
+        db_table = 'jitsuitemcategory'
 
 
 class Message(models.Model):
@@ -427,6 +430,34 @@ class Sqlmodelbase(models.Model):
         db_table = 'sqlmodelbase'
 
 
+class Supplier(models.Model):
+    uuid = models.UUIDField(primary_key=True)
+    name = models.CharField(unique=True, blank=True, null=True)
+    address = models.CharField(blank=True, null=True)
+    includes_gst_in_prices = models.BooleanField()
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField()
+    deleted_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'supplier'
+
+
+class Supplieritem(models.Model):
+    uuid = models.UUIDField(primary_key=True)
+    deleted_row = models.BooleanField(blank=True, null=True)
+    supplier_uuid = models.ForeignKey(Supplier, models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
+    supplieritem_code = models.CharField(blank=True, null=True)
+    supplieritem_description = models.CharField(blank=True, null=True)
+    jitsuitem_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsuitem_uuid', blank=True, null=True)
+    unit_of_purchase = models.CharField(blank=True, null=True)
+    quantity_unit_of_purchase_in_unit_of_usage = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'supplieritem'
+        unique_together = (('supplier_uuid', 'supplieritem_code'),)
 
 
 class TaggitTag(models.Model):
@@ -440,13 +471,13 @@ class TaggitTag(models.Model):
 
 class TaggitTaggeditem(models.Model):
     object_id = models.IntegerField()
-    content_type = models.ForeignKey(DjangoContentType, models.DO_NOTHING)
+    content_type_id = models.IntegerField()
     tag = models.ForeignKey(TaggitTag, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'taggit_taggeditem'
-        unique_together = (('content_type', 'object_id', 'tag'),)
+        unique_together = (('content_type_id', 'object_id', 'tag'),)
 
 
 class TaxRate(models.Model):
@@ -494,9 +525,28 @@ class Userrole(models.Model):
         db_table = 'userrole'
 
 
+class XInvoiceentryOld(models.Model):
+    id = models.UUIDField(blank=True, null=True)
+    invoice_id = models.UUIDField(blank=True, null=True)
+    supplier_uuid = models.UUIDField(blank=True, null=True)
+    entry_qty = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    entry_price = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    entry_discount = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    entry_gross_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    entry_waste_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    entry_supplier_item_code = models.CharField(blank=True, null=True)
+    entry_supplier_description = models.CharField(max_length=1024, blank=True, null=True)
+    entry_jitsu_item_code = models.UUIDField(blank=True, null=True)
+    supplier_item_uuid = models.UUIDField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'x_invoiceentry_old'
+
+
 class XSupplierItemsOld(models.Model):
     id = models.UUIDField(primary_key=True)
-    link_to_supplier_uuid = models.ForeignKey('XSuppliersOld', models.DO_NOTHING, db_column='link_to_supplier_uuid', blank=True, null=True)
+    link_to_supplier_uuid = models.UUIDField(blank=True, null=True)
     supplied_item_unit_of_measure_text = models.TextField(blank=True, null=True)
     quantity_unit_of_purchase_in_unit_of_usage = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
     link_to_item_uuid = models.UUIDField(blank=True, null=True)
@@ -521,21 +571,6 @@ class XSupplierV00(models.Model):
     class Meta:
         managed = False
         db_table = 'x_supplier_v00'
-
-
-class XSupplieritemEmpty(models.Model):
-    uuid = models.UUIDField(primary_key=True)
-    supplier_item_code = models.CharField(blank=True, null=True)
-    supplier_item_description = models.CharField(blank=True, null=True)
-    unit_of_purchase = models.CharField(blank=True, null=True)
-    quantity_unit_of_purchase_in_unit_of_usage = models.FloatField(blank=True, null=True)
-    jitsuitem_uuid = models.ForeignKey(Jitsuitem, models.DO_NOTHING, db_column='jitsuitem_uuid', blank=True, null=True)
-    supplier_uuid = models.ForeignKey(Supplier, models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'x_supplieritem_empty'
-        unique_together = (('uuid', 'supplier_item_code'),)
 
 
 class XSuppliersOld(models.Model):

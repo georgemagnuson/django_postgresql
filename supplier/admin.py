@@ -52,8 +52,37 @@ class SupplieritemAdmin(admin.ModelAdmin):
 
 admin.site.register(Supplieritem, SupplieritemAdmin)
 
-admin.site.register(Invoice)
 
-admin.site.register(Invoiceentry)
+class InvoiceAdmin(admin.ModelAdmin):
+    list_display = (
+        'invoice_date',
+        'invoice_issuer',
+        'invoice_number',
+        'invoice_amount_gross',
+        )
 
-admin.site.register(Message)
+    list_per_page = 20
+
+
+admin.site.register(Invoice, InvoiceAdmin)
+
+
+class InvoiceentryAdmin(admin.ModelAdmin):
+    list_display = (
+        'entry_supplieritem_code',
+        'entry_supplieritem_description',
+        'entry_qty',
+        'entry_price',
+        )
+
+    list_per_page = 20
+
+
+admin.site.register(Invoiceentry, InvoiceentryAdmin)
+
+
+class MessageAdmin(admin.ModelAdmin):
+    list_per_page = 20
+
+
+admin.site.register(Message, MessageAdmin)

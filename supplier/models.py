@@ -53,15 +53,18 @@ class Supplieritem(models.Model):
 class Invoice(models.Model):
     uuid = models.UUIDField(primary_key=True)
     gmail_message = models.ForeignKey('Message', models.DO_NOTHING, to_field='gmail_message_id', blank=True, null=True)
+
     invoice_date = models.DateField()
     invoice_issuer = models.ForeignKey(
         'Supplier', models.DO_NOTHING, db_column='invoice_issuer', to_field='name', blank=True, null=True
         )
+
     invoice_supplier_uuid = models.UUIDField(blank=True, null=True)
+
     invoice_number = models.CharField()
-    invoice_amount_gross = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    invoice_amount_gst = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    invoice_amount_net = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+    invoice_amount_gross = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    invoice_amount_gst = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    invoice_amount_net = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
     invoice_credit = models.BooleanField(blank=True, null=True)
     deleted_row = models.BooleanField(blank=True, null=True)
 
@@ -75,25 +78,6 @@ class Invoice(models.Model):
 
 class Invoiceentry(models.Model):
     uuid = models.UUIDField(primary_key=True)
-    gmail_message_id = models.CharField(blank=True, null=True)
-    entry_supplieritem_code = models.CharField(blank=True, null=True)
-    entry_jitsuitem_uuid = models.ForeignKey(
-        Supplieritem,
-        to_field='jitsuitem_uuid',
-        on_delete=models.DO_NOTHING,
-        db_column='entry_jitsuitem_uuid',
-        blank=True,
-        null=True
-        )
-    entry_supplieritem_description = models.CharField(blank=True, null=True)
-    entry_qty = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_unit_of_purchase = models.CharField(blank=True, null=True)
-    entry_price = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_discount = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_gross_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_net_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    entry_number_of_pieces = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
-    deleted_row = models.BooleanField(blank=True, null=True)
     invoice_uuid = models.ForeignKey(
         Invoice,
         db_column='invoice_uuid',
@@ -102,9 +86,33 @@ class Invoiceentry(models.Model):
         blank=True,
         null=True
         )
+
+    entry_supplieritem_code = models.CharField(blank=True, null=True)
+    entry_supplieritem_description = models.CharField(blank=True, null=True)
+
+    entry_qty = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    entry_unit_of_purchase = models.CharField(blank=True, null=True)
+    entry_price = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    entry_discount = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    entry_gross_weight = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    entry_net_weight = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+    entry_number_of_pieces = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+
+    entry_waste_weight = models.DecimalField(max_digits=10, decimal_places=4, blank=True, null=True)
+
     supplier_uuid = models.UUIDField(db_column='supplier_uuid', blank=True, null=True)
     supplieritem_uuid = models.UUIDField(db_column='supplieritem_uuid', blank=True, null=True)
-    entry_waste_weight = models.DecimalField(max_digits=65535, decimal_places=65535, blank=True, null=True)
+
+    entry_jitsuitem_uuid = models.ForeignKey(
+        Supplieritem,
+        to_field='jitsuitem_uuid',
+        on_delete=models.DO_NOTHING,
+        db_column='entry_jitsuitem_uuid',
+        blank=True,
+        null=True
+        )
+
+    deleted_row = models.BooleanField(blank=True, null=True)
 
     class Meta:
         managed = False
