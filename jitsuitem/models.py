@@ -19,7 +19,13 @@ class Jitsuitem(models.Model):
     uuid = models.UUIDField(primary_key=True)
     deleted_row = models.BooleanField(blank=True, null=True)
     description = models.CharField()
-    category_uuid = models.ForeignKey(Jitsuitemcategory, models.DO_NOTHING, db_column='category_uuid', blank=True, null=True)
+    category_uuid = models.ForeignKey(
+        Jitsuitemcategory,
+        models.DO_NOTHING,
+        db_column='category_uuid',
+        blank=True,
+        null=True
+        )
     unit_of_measure = models.CharField(blank=True, null=True)
     cost_per_unit_of_measure = models.FloatField(blank=True, null=True)
 

@@ -21,7 +21,7 @@ admin.site.register(Supplier, SupplierAdmin)
 
 class SupplieritemAdmin(admin.ModelAdmin):
     list_display = (
-        'supplier_uuid',
+        'supplier_uuid_name',
         'supplieritem_code',
         'supplieritem_description',
         'jitsuitem_uuid_description',
@@ -29,7 +29,14 @@ class SupplieritemAdmin(admin.ModelAdmin):
         'qty_purch_in_usage',
         )
 
+    list_filter = ('supplier_uuid__name',)
+
     list_per_page = 20
+
+    def supplier_uuid_name(self, obj):
+        if obj.supplier_uuid:
+            return obj.supplier_uuid.name
+        return None
 
     def jitsuitem_uuid_description(self, obj):
         if obj.jitsuitem_uuid:

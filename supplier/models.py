@@ -24,7 +24,12 @@ class Supplier(models.Model):
 class Supplieritem(models.Model):
     uuid = models.UUIDField(primary_key=True)
     deleted_row = models.BooleanField(blank=True, null=True)
-    supplier_uuid = models.ForeignKey('Supplier', models.DO_NOTHING, db_column='supplier_uuid', blank=True, null=True)
+    supplier_uuid = models.ForeignKey(
+        Supplier,
+        models.DO_NOTHING,
+        db_column='supplier_uuid',
+        blank=True,
+        null=True)
     supplieritem_code = models.CharField(db_column='supplieritem_code', blank=True, null=True)
     supplieritem_description = models.CharField(blank=True, null=True)
     jitsuitem_uuid = models.ForeignKey(
@@ -50,13 +55,45 @@ class Supplieritem(models.Model):
         return f'{self.supplieritem_code} - {self.supplieritem_description}'
 
 
+class Message(models.Model):
+    uuid = models.UUIDField(primary_key=True)
+    gmail_message_id = models.CharField(unique=True, blank=True, null=True)
+    message_date = models.DateField(blank=True, null=True)
+    message_from = models.CharField(blank=True, null=True)
+    message_to = models.CharField(blank=True, null=True)
+    message_subject = models.CharField(blank=True, null=True)
+    message_raw = models.CharField(blank=True, null=True)
+    deleted_row = models.BooleanField(blank=True, null=True, db_comment='instead of deleting just check this')
+    message_has_attachments = models.BooleanField(blank=True, null=True)
+    message_processed = models.BooleanField(blank=True, null=True)
+    message_status = models.CharField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'message'
+
+    def __str__(self):
+        return f'{self.message_date} - From:{self.message_from} - Subject:{self.message_subject}'
+
+
 class Invoice(models.Model):
     uuid = models.UUIDField(primary_key=True)
-    gmail_message = models.ForeignKey('Message', models.DO_NOTHING, to_field='gmail_message_id', blank=True, null=True)
+    gmail_message = models.ForeignKey(
+        Message,
+        models.DO_NOTHING,
+        to_field='gmail_message_id',
+        blank=True,
+        null=True
+        )
 
     invoice_date = models.DateField()
     invoice_issuer = models.ForeignKey(
-        'Supplier', models.DO_NOTHING, db_column='invoice_issuer', to_field='name', blank=True, null=True
+        Supplier,
+        models.DO_NOTHING,
+        db_column='invoice_issuer',
+        to_field='name',
+        blank=True,
+        null=True
         )
 
     invoice_supplier_uuid = models.UUIDField(blank=True, null=True)
@@ -122,22 +159,3 @@ class Invoiceentry(models.Model):
         return f'{self.entry_supplieritem_code} : {self.entry_supplieritem_description} - {self.entry_qty}'
 
 
-class Message(models.Model):
-    uuid = models.UUIDField(primary_key=True)
-    gmail_message_id = models.CharField(unique=True, blank=True, null=True)
-    message_date = models.DateField(blank=True, null=True)
-    message_from = models.CharField(blank=True, null=True)
-    message_to = models.CharField(blank=True, null=True)
-    message_subject = models.CharField(blank=True, null=True)
-    message_raw = models.CharField(blank=True, null=True)
-    deleted_row = models.BooleanField(blank=True, null=True, db_comment='instead of deleting just check this')
-    message_has_attachments = models.BooleanField(blank=True, null=True)
-    message_processed = models.BooleanField(blank=True, null=True)
-    message_status = models.CharField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'message'
-
-    def __str__(self):
-        return f'{self.message_date} - From:{self.message_from} - Subject:{self.message_subject}'
